@@ -60,5 +60,5 @@ composer.phar
 /package-lock.json
 /yarn.lock
 
-/data
-/logs
+/data/
+/logs/
