@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  dotenv:
+    image: 'alpine:latest'
+    volumes:
+      - './entrypoint.sh:/entrypoint.sh'
+      - './.env:/.env'
+    entrypoint: '/bin/sh'
+    command: '/entrypoint.sh'
+
+  symfony:
+    container_name: symfony
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www/html/productsup_xml_importer/
+      - /:/host
+      - /var/www/html/productsup_xml_importer/var/log/:/var/www/html/productsup_xml_importer/var/log/
+    entrypoint: ['/entrypoint.sh'] # Specify the entrypoint script here
+    command: ["symfony", "local:server:start", "--port=8000", "--allow-http", "--no-tls"]
+    network_mode: bridge
+    depends_on:
+      - dotenv
+
+  importer:
+    image: docker.pkg.github.com/delegend17/xml-importer/products-up-xml-importer:1.2
+    volumes:
+      - .:/var/www/html/productsup_xml_importer
+      - /:/host
+    entrypoint: php
+    network_mode: host
+    depends_on:
+      - dotenv
+
+  phpunit:
+    image: docker.pkg.github.com/delegend17/xml-importer/products-up-xml-importer:1.2
+    volumes:
+      - .:/var/www/html/productsup_xml_importer
+      - /:/host
+    entrypoint: vendor/bin/phpunit
+    command:
+      - "--configuration"
+      - "/var/www/html/productsup_xml_importer/phpunit.xml"
+    depends_on:
+      - dotenv

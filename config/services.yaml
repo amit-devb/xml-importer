@@ -1,0 +1,66 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+
+imports:
+    - { resource: constants.php }
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: "../src/"
+        exclude:
+            - "../src/DependencyInjection/"
+            - "../src/Entity/"
+            - "../src/Kernel.php"
+
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\:
+        resource: "../src/Controller/"
+        tags: ["controller.service_arguments"]
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+    App\Adapter\CsvStorageAdapter:
+        arguments:
+            $csvFilePath: "%kernel.project_dir%/data/output_{timestamp}.csv"
+
+    App\Logger\DailyFileLogger:
+        class: Monolog\Logger
+        arguments:
+            $name: "daily_file_logger"
+            $handlers:
+                - '@App\Logger\Handler\RotatingFileHandler'
+        public: false
+
+    App\Logger\Handler\RotatingFileHandler:
+        class: Monolog\Handler\RotatingFileHandler
+        arguments:
+            $filename: "%kernel.logs_dir%/%kernel.environment%.log"
+            $maxFiles: 7
+            $level: "debug"
+        public: false
+
+    App\Services\XmlReader\FtpXmlReader: ~
+
+    App\Services\XmlReader\LocalXmlReader: ~
+
+    App\Contracts\XmlReaderInterface:
+        alias: App\Services\XmlReader\LocalXmlReader
+
+    App\Command\ImportXmlCommand:
+        arguments:
+            $storageAdapter: '@App\Contracts\StorageAdapterInterface'
+            $logger: '@Psr\Log\LoggerInterface'
+            $xmlReader: '@App\Contracts\XmlReaderInterface'
+        tags: ["console.command"]

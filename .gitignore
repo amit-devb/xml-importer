@@ -1,0 +1,61 @@
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
+
+# Symfony specific
+/var/
+/vendor/
+/bin/
+/build/
+/public/bundles/
+/public/build/
+/public/uploads/
+/public/media/cache/
+/var/cache/
+/var/logs/
+/var/sessions/
+/.env.local
+/.env.local.php
+/.phpunit.result.cache
+/.phpstorm.meta.php
+/phpunit.xml
+/!**/.env
+/!**/.env.local
+/!**/.env.test
+/!**/.phpunit.result.cache
+/!**/.phpstorm.meta.php
+
+# User-specific files
+/.idea/
+/.vscode/
+/.phpstorm/
+/.phpstorm_helpers
+/.phpstorm.meta.php
+
+# Composer
+composer.phar
+/composer.phar
+/vendor/
+/composer.lock
+
+# Node.js
+/node_modules/
+/package-lock.json
+/yarn.lock
